@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment variables (SECRETS)
+.env
+.env.*
+!.env.example
+
+# Build output
+dist/
+build/
+out/
+
+# Cache & temp
+.cache/
+.tmp/
+.eslintcache
+.npm/
+.pnpm-store/
+
+# Coverage
+coverage/
+.nyc_output/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
