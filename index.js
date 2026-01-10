@@ -1,6 +1,9 @@
 import express from "express";
 import bodyParser from "body-parser";
 import pg from "pg";
+import bcrypt, { hash } from 'bcrypt';
+
+
 
 const db = new pg.Client({
   user: "postgres",
@@ -11,7 +14,7 @@ const db = new pg.Client({
 });
 db.connect();
 
-
+const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS) || 10;
 const app = express();
 const port = 3000;
 
@@ -33,6 +36,7 @@ app.get("/register", (req, res) => {
 app.post("/register", async (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
+  const hashed_password = await bcrypt.hash(password,SALT_ROUNDS)
  try{
   const checkResult = await db.query("SELECT * FROM users WHERE email=$1", [
     username,
@@ -42,7 +46,7 @@ app.post("/register", async (req, res) => {
   } else {
     const result = await db.query(
       "INSERT INTO users (email, password) VALUES ($1, $2)",
-      [username, password]
+      [username, hashed_password]
     );
     console.log(result);
     res.render("secrets.ejs");
@@ -59,7 +63,7 @@ app.post("/login", async (req, res) => {
   try{
     const available = await db.query("SELECT * from users where email=$1",[username])
     if (available.rows.length > 0){
-      if(available.rows[0].password == password){
+      if(bcrypt.compareSync(password, available.rows[0].password)){
         res.render("secrets.ejs");
       }else{
         res.render("login.ejs", { err: "Incorrect Password" });
